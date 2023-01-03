@@ -1,4 +1,4 @@
-# 2d-elastic-collision
+# 2d elastic collision
 
 Javascript 2d elastic collision
 
