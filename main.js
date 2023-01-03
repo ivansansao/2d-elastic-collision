@@ -8,14 +8,17 @@ function setup() {
 
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(60)
-    balls.push(new Ball({ m: 10, r: 30, v: { x: 0.5, y: 0.3 }, p: { x: 200, y: 200 } }))
-    // balls.push(new Ball({ m: 100, r: 60, v: { x: -0.1, y: -0.1 }, p: { x: 190, y: 295 } }))
+    balls.push(new Ball({ m: 80, r: 30, v: { x: 0.5, y: 0.3 }, p: { x: 600, y: 200 } }))
+    balls.push(new Ball({ m: 100, r: 60, v: { x: -0.1, y: -0.1 }, p: { x: 190, y: 295 } }))
     // balls.push(new Ball({ m: 5, r: 60, v: { x: -0.01, y: -0.01 }, p: { x: 400, y: 120 } }))
     // balls.push(new Ball({ m: 100, r: 60, v: { x: 1.8, y: 1.7 }, p: { x: 190, y: 100 } }))
 
     balls.push(new Ball({ m: 800, r: 30, v: { x: 0.0, y: 0.01 }, p: { x: 500, y: 400 } }))
     balls.push(new Ball({ m: 100, r: 60, v: { x: 0, y: 1.7 }, p: { x: 250, y: 100 } }))
-    balls.push(new Ball({ m: 800, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 320, y: 400 } }))
+    balls.push(new Ball({ m: 8000, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 320, y: 400 } }))
+
+    balls.push(new Ball({ m: 200, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 700, y: 100 } }))
+    balls.push(new Ball({ m: 200, r: 30, v: { x: -1.0, y: 0.0 }, p: { x: 1000, y: 100 } }))
 
 }
 
@@ -23,7 +26,7 @@ function draw() {
     // console.log('--- New loop ---')
 
     logs = [];
-    // background(255, 255, 255, 5);
+    background(255, 255, 255, 5);
 
     compared = []
     for (const ball of balls) {
@@ -34,7 +37,7 @@ function draw() {
     }
 
 
-    logs.push("Framecount: " + frameCount);
+    // logs.push("Framecount: " + frameCount);
 
     showInfo();
     // if (frameCount >= 200) {
@@ -71,13 +74,16 @@ class Ball {
     }
 
     show() {
-        stroke(0)
         if (this.collided) {
             fill(255, 0, 0)
         } else {
-            fill(255)
+            const mapId = map(this.id, 0, id, 0, 360)
+            const color = 'hsla(' + mapId + ',100%,50%,0.8)';
+            fill(color)
         }
+        stroke(200)
         circle(this.p.x, this.p.y, this.r * 2)
+        stroke(0)
         text(this.m, this.p.x, this.p.y)
     }
     collideWalls(box) {
@@ -122,7 +128,7 @@ class Ball {
 
                     if (cp.id1 == this.id && cp.id2 == other.id) {
                         allread = true
-                        console.log("Allread")
+                        // console.log("Allread")
                         // noLoop();
                         break
                     }
