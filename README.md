@@ -2,4 +2,4 @@
 
 Javascript 2d elastic collision
 
-![Alt Text](src/assets/show1.gif)
+![Alt Text](assets/show1.gif)
