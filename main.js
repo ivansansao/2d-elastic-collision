@@ -6,6 +6,12 @@ let id = 1;
 function keyPressed() {
 
     if (key == 'l') {
+        for (const ball of balls) {
+            // ball.collide();
+            // ball.collideWalls(box);
+            ball.move();
+
+        }
         loop()
     }
 
@@ -16,7 +22,7 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(60)
     // balls.push(new Ball({ m: 80, r: 30, v: { x: 0.5, y: 0.3 }, p: { x: 600, y: 200 } }))
-    balls.push(new Ball({ name: 'a', m: 100, r: 60, v: { x: 0, y: 20 }, p: { x: 250, y: 100 } }))
+    balls.push(new Ball({ name: 'a', m: 100, r: 60, v: { x: 0, y: 30 }, p: { x: 250, y: 100 } }))
     balls.push(new Ball({ name: 'b', m: 101, r: 60, v: { x: 0, y: 0 }, p: { x: 250, y: 270 } }))
     // balls.push(new Ball({ m: 5, r: 60, v: { x: -0.01, y: -0.01 }, p: { x: 400, y: 120 } }))
     // balls.push(new Ball({ m: 100, r: 60, v: { x: 1.8, y: 1.7 }, p: { x: 190, y: 100 } }))
@@ -33,6 +39,8 @@ function setup() {
 function draw() {
     // console.log('--- New loop ---')
 
+    showGrid()
+
     logs = [];
     background(255, 255, 255, 5);
 
@@ -40,8 +48,6 @@ function draw() {
     for (const ball of balls) {
         // ball.collide();
         // ball.collideWalls(box);
-        ball.show();
-        ball.move();
         ball.show();
     }
 
@@ -115,42 +121,62 @@ class Ball {
         }
 
     }
-    willOverlap() {
+
+    getNearstBall() {
+        let nearstDist = 99999
+        let nearstBall = false
 
         for (const othe of balls) {
 
             if (othe != this) {
                 const b1 = this.p
                 const b2 = othe.p
-                const sumRays = this.r + othe.r
                 let d = dist(b1.x, b1.y, b2.x, b2.y)
-                const dBordas = d - sumRays
 
-                const newP1 = createVector(this.p.x + this.v.x, this.p.y + this.v.y)
-                const newP2 = createVector(othe.p.x + othe.v.x, othe.p.y + othe.v.y)
-                const newDi = dist(newP1.x, newP1.y, newP2.x, newP2.y)
-
-                if (this.name == 'a' && othe.name != 'a') {
-                    console.log(`(${this.name}) d:  ${d} Ray sum: ${sumRays}, Vel x: ${this.v.x} y: ${this.v.y} newDi ${newDi} dBordas: ${dBordas}`)
+                if (d < nearstDist) {
+                    nearstDist = d
+                    nearstBall = othe
                 }
-
-                if (newDi < sumRays) {
-                    console.log('Will overlap')
-                    return true
-                }
-
             }
-
         }
+
+        return nearstBall
+    }
+
+    willOverlap() {
+
+
+        let othe = this.getNearstBall()
+
+        const b1 = this.p
+        const b2 = othe.p
+        const sumRays = this.r + othe.r
+        let d = dist(b1.x, b1.y, b2.x, b2.y)
+        const dBordas = d - sumRays
+
+        const newP1 = createVector(this.p.x + this.v.x, this.p.y + this.v.y)
+        const newP2 = createVector(othe.p.x + othe.v.x, othe.p.y + othe.v.y)
+        const newDi = dist(newP1.x, newP1.y, newP2.x, newP2.y)
+
+        if (this.name == 'a' && othe.name != 'a') {
+            console.log(`(${this.name}) d:  ${d} Ray sum: ${sumRays}, Vel x: ${this.v.x} y: ${this.v.y} newDi ${newDi} dBordas: ${dBordas}`)
+        }
+        if (newDi < sumRays) {
+            console.log(this.name + ' will overlap ' + othe.name)
+            return true
+        }
+
+
+
         return false
 
     }
 
     move() {
-        if (!this.willOverlap()) {
-            this.p.x += this.v.x
-            this.p.y += this.v.y
-        }
+        this.p.x += this.v.x
+        this.p.y += this.v.y
+        this.willOverlap()
+
     }
 
     collide() {
@@ -238,5 +264,18 @@ class Ball {
             // other.p.x += other.v.x
             // other.p.y += other.v.y
         }
+    }
+}
+
+function showGrid() {
+
+    noFill()
+    textSize(7)
+    strokeWeight(0.3)
+    for (let y = 0; y < innerHeight; y += 10) {
+        stroke(230)
+        line(0, y, innerWidth, y)
+        stroke(0)
+        text(y, 140, y - 1)
     }
 }
