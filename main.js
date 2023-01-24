@@ -158,12 +158,20 @@ class Ball {
         const newP2 = createVector(othe.p.x + othe.v.x, othe.p.y + othe.v.y)
         const newDi = dist(newP1.x, newP1.y, newP2.x, newP2.y)
 
-        if (this.name == 'a' && othe.name != 'a') {
-            console.log(`(${this.name}) d:  ${d} Ray sum: ${sumRays}, Vel x: ${this.v.x} y: ${this.v.y} newDi ${newDi} dBordas: ${dBordas}`)
-        }
-        if (newDi < sumRays) {
-            console.log(this.name + ' will overlap ' + othe.name)
-            return true
+        const dDif = d - newDi
+        const fatorRed = dBordas / dDif
+
+        if (fatorRed < 1) {
+
+            const altVel = createVector(this.v.x, this.v.y).mult(fatorRed)
+
+            // if (this.name == 'a' && othe.name != 'a') {
+            console.log(`(${this.name}) d:  ${d} Ray sum: ${sumRays}, Vel x: ${this.v.x} y: ${this.v.y} newDi ${newDi} dBordas: ${dBordas} dDif: ${dDif} mult v: ${fatorRed} altVel:  ${altVel}`)
+            // }
+            if (newDi < sumRays) {
+                console.log(newDi, sumRays, this.name + ' will overlap ' + othe.name)
+                return altVel
+            }
         }
 
 
@@ -173,9 +181,17 @@ class Ball {
     }
 
     move() {
-        this.p.x += this.v.x
-        this.p.y += this.v.y
-        this.willOverlap()
+        const altVel = this.willOverlap()
+
+        if (altVel) {
+            this.p.x += altVel.x
+            this.p.y += altVel.y
+
+        } else {
+            this.p.x += this.v.x
+            this.p.y += this.v.y
+        }
+
 
     }
 
