@@ -3,22 +3,30 @@ const box = { x: 0, y: 0, x1: window.innerWidth, y1: window.innerHeight }
 let compared = []
 let id = 1;
 
+function keyPressed() {
+
+    if (key == 'l') {
+        loop()
+    }
+
+}
 
 function setup() {
 
     createCanvas(window.innerWidth, window.innerHeight);
     frameRate(60)
-    balls.push(new Ball({ m: 80, r: 30, v: { x: 0.5, y: 0.3 }, p: { x: 600, y: 200 } }))
-    balls.push(new Ball({ m: 100, r: 60, v: { x: -0.1, y: -0.1 }, p: { x: 190, y: 295 } }))
+    // balls.push(new Ball({ m: 80, r: 30, v: { x: 0.5, y: 0.3 }, p: { x: 600, y: 200 } }))
+    balls.push(new Ball({ name: 'a', m: 100, r: 60, v: { x: 0, y: 20 }, p: { x: 250, y: 100 } }))
+    balls.push(new Ball({ name: 'b', m: 101, r: 60, v: { x: 0, y: 0 }, p: { x: 250, y: 270 } }))
     // balls.push(new Ball({ m: 5, r: 60, v: { x: -0.01, y: -0.01 }, p: { x: 400, y: 120 } }))
     // balls.push(new Ball({ m: 100, r: 60, v: { x: 1.8, y: 1.7 }, p: { x: 190, y: 100 } }))
 
-    balls.push(new Ball({ m: 800, r: 30, v: { x: 0.0, y: 0.01 }, p: { x: 500, y: 400 } }))
-    balls.push(new Ball({ m: 100, r: 60, v: { x: 0, y: 1.7 }, p: { x: 250, y: 100 } }))
-    balls.push(new Ball({ m: 8000, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 320, y: 400 } }))
+    // balls.push(new Ball({ m: 800, r: 30, v: { x: 0.0, y: 0.01 }, p: { x: 500, y: 400 } }))
+    // balls.push(new Ball({ m: 8000, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 320, y: 400 } }))
 
-    balls.push(new Ball({ m: 200, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 700, y: 100 } }))
-    balls.push(new Ball({ m: 200, r: 30, v: { x: -1.0, y: 0.0 }, p: { x: 1000, y: 100 } }))
+    // balls.push(new Ball({ m: 200, r: 30, v: { x: 0.0, y: 0.0 }, p: { x: 700, y: 100 } }))
+    // balls.push(new Ball({ m: 200, r: 30, v: { x: -1.0, y: 0.0 }, p: { x: 1000, y: 100 } }))
+    noLoop()
 
 }
 
@@ -30,8 +38,9 @@ function draw() {
 
     compared = []
     for (const ball of balls) {
-        ball.collide();
-        ball.collideWalls(box);
+        // ball.collide();
+        // ball.collideWalls(box);
+        ball.show();
         ball.move();
         ball.show();
     }
@@ -43,6 +52,7 @@ function draw() {
     // if (frameCount >= 200) {
     //     noLoop()
     // }
+    noLoop()
 }
 
 
@@ -62,8 +72,9 @@ function showInfo() {
 
 class Ball {
 
-    constructor({ m, r, v, p }) {
+    constructor({ name, m, r, v, p }) {
 
+        this.name = name // Mass scalar
         this.m = m // Mass scalar
         this.r = r // Ray scalar
         this.v = v // Valocity vector
@@ -74,17 +85,19 @@ class Ball {
     }
 
     show() {
-        if (this.collided) {
-            fill(255, 0, 0)
-        } else {
-            const mapId = map(this.id, 0, id, 0, 360)
-            const color = 'hsla(' + mapId + ',100%,50%,0.8)';
-            fill(color)
-        }
-        stroke(200)
+        const mapId = map(this.id, 0, id, 0, 360)
+        const color = 'hsla(' + mapId + ',100%,50%,0.8)';
+        fill(color)
+        strokeWeight(2)
+        stroke(0)
         circle(this.p.x, this.p.y, this.r * 2)
         stroke(0)
-        text(this.m, this.p.x, this.p.y)
+        textAlign(CENTER)
+        textSize(28)
+        fill(255)
+        text(this.name, this.p.x, this.p.y)
+
+
     }
     collideWalls(box) {
 
@@ -102,10 +115,42 @@ class Ball {
         }
 
     }
+    willOverlap() {
+
+        for (const othe of balls) {
+
+            if (othe != this) {
+                const b1 = this.p
+                const b2 = othe.p
+                const sumRays = this.r + othe.r
+                let d = dist(b1.x, b1.y, b2.x, b2.y)
+                const dBordas = d - sumRays
+
+                const newP1 = createVector(this.p.x + this.v.x, this.p.y + this.v.y)
+                const newP2 = createVector(othe.p.x + othe.v.x, othe.p.y + othe.v.y)
+                const newDi = dist(newP1.x, newP1.y, newP2.x, newP2.y)
+
+                if (this.name == 'a' && othe.name != 'a') {
+                    console.log(`(${this.name}) d:  ${d} Ray sum: ${sumRays}, Vel x: ${this.v.x} y: ${this.v.y} newDi ${newDi} dBordas: ${dBordas}`)
+                }
+
+                if (newDi < sumRays) {
+                    console.log('Will overlap')
+                    return true
+                }
+
+            }
+
+        }
+        return false
+
+    }
 
     move() {
-        this.p.x += this.v.x
-        this.p.y += this.v.y
+        if (!this.willOverlap()) {
+            this.p.x += this.v.x
+            this.p.y += this.v.y
+        }
     }
 
     collide() {
